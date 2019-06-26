@@ -18,7 +18,7 @@
 #![no_std]
 #![deny(missing_docs)]
 
-use cast::{i16, u16};
+use cast::{i16, u16, u32};
 use core::mem;
 use generic_array::typenum::consts::*;
 use generic_array::{ArrayLength, GenericArray};
@@ -184,8 +184,8 @@ where
 
     #[allow(dead_code)] // TODO remove
     #[allow(missing_docs)] // TODO remove
-    pub fn read(&mut self) -> Result<(), E> {
-        self.write_register(Lps22ReadWriteRegister::CTRL_REG2, 0b00010000 | 1)?;
+    pub fn read(&mut self) -> Result<(i16, u32), E> {
+        self.write_register(Lps22ReadWriteRegister::CTRL_REG2, 0b00010001)?;
 
         let t: GenericArray<u8, U2> = self.read_register(Lps22ReadRegister::TEMP_OUT_L)?;
         let t: i16 = i16(t[0]) + (i16(t[1]) << 8);
@@ -193,10 +193,10 @@ where
 
         let p: GenericArray<u8, U3> = self.read_register(Lps22ReadRegister::PRESSURE_OUT_XL)?;
         // TODO data-sheet says signed decimal, why? The value cannot be negative!
-        let p: u16 = u16(p[0]) + (u16(p[1]) << 8) + (u16(p[2]) << 16);
+        let p: u32 = u32(p[0]) + (u32(p[1]) << 8) + (u32(p[2]) << 16);
         // TODO p/4096 == hPa
 
-        Ok(()) // TODO result structure
+        Ok((t, p)) // TODO result structure
     }
 }
 
