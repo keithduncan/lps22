@@ -159,6 +159,11 @@ where
         Ok(Lps22 { address, i2c })
     }
 
+    /// Consume the sensor and return the underlying i2c peripheral.
+    pub fn free(self) -> I2C {
+        self.i2c
+    }
+
     #[allow(dead_code)] // TODO remove
     fn read_register<N, R>(&mut self, reg: R) -> Result<GenericArray<u8, N>, E>
     where
