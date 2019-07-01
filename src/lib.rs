@@ -187,10 +187,21 @@ where
         self.i2c.write(self.address.addr(), &[reg.addr(), byte])
     }
 
+    #[allow(missing_docs)] // TODO remove
+    pub fn set_one_shot(&mut self) -> Result<(), E> {
+        self.write_register(Lps22ReadWriteRegister::CTRL_REG2, 0b0001_0001)
+    }
+
+    #[allow(missing_docs)] // TODO remove
+    pub fn is_one_shot(&mut self) -> Result<bool, E> {
+        let crtl2: GenericArray<u8, U1> = self.read_register(Lps22ReadWriteRegister::CTRL_REG2)?;
+        Ok((crtl2[0] & 0b0000_0001) != 0)
+    }
+
     #[allow(dead_code)] // TODO remove
     #[allow(missing_docs)] // TODO remove
     pub fn read_temperature_x100(&mut self) -> Result<i16, E> {
-        self.write_register(Lps22ReadWriteRegister::CTRL_REG2, 0b0001_0001)?;
+        self.write_register(Lps22ReadWriteRegister::CTRL_REG2, 0b0001_0000)?;
 
         let t: GenericArray<u8, U2> = self.read_register(Lps22ReadRegister::TEMP_OUT_L)?;
         let t: i16 = i16(t[0]) + (i16(t[1]) << 8);
@@ -201,7 +212,7 @@ where
     #[allow(dead_code)] // TODO remove
     #[allow(missing_docs)] // TODO remove
     pub fn read_pressure_x4096(&mut self) -> Result<u32, E> {
-        self.write_register(Lps22ReadWriteRegister::CTRL_REG2, 0b0001_0001)?;
+        self.write_register(Lps22ReadWriteRegister::CTRL_REG2, 0b0001_0000)?;
 
         let p: GenericArray<u8, U3> = self.read_register(Lps22ReadRegister::PRESSURE_OUT_XL)?;
         // TODO data-sheet says signed decimal, why? The value cannot be negative!
