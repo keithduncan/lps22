@@ -170,6 +170,7 @@ where
         N: ArrayLength<u8>,
         R: ReadRegister,
     {
+        #[allow(deprecated)]
         let mut buffer: GenericArray<u8, N> = unsafe { mem::uninitialized() };
         {
             let buffer: &mut [u8] = &mut buffer;
